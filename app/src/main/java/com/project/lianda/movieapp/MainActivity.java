@@ -1,9 +1,12 @@
 package com.project.lianda.movieapp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.nfc.Tag;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity{
                 .build();
         MoviesApiService service = restAdapter.create(MoviesApiService.class);
         service.getPopularMovies(new Callback<Movie.MovieResult>() {
+
             @Override
             public void success(Movie.MovieResult movieResult, Response response) {
                 mAdapter.setMovieList(movieResult.getResults());
@@ -114,16 +118,25 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private boolean checkInternetConnection(){
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        if (cm.getActiveNetworkInfo() != null
-                && cm.getActiveNetworkInfo().isConnected()){
-            return true;
-        } else {
-            invalideData();
+       // mLoadingIndicator.setVisibility(View.VISIBLE);
+        if (mRecyclerView != null){
+            getPopularMovies();
+            showDataView();
+        }else {
             showErrorMessage();
-            return false;
         }
+//        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+//
+//        if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected()){
+//            showDataView();
+//        } else {
+//            showErrorMessage();
+//        }
+        return true;
+    }
+    private void showDataView() {
+        mErrorMsgDisplay.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
     }
 
     private void showErrorMessage(){
@@ -131,7 +144,7 @@ public class MainActivity extends AppCompatActivity{
         mErrorMsgDisplay.setVisibility(View.VISIBLE);
     }
 
-    private void invalideData(){
+    private void invalidData(){
         mAdapter.setMovieList(null);
     }
 
